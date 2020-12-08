@@ -1,22 +1,22 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useRef} from 'react';
 import {View, Text, Image} from 'react-native';
 import styled from 'styled-components/native'
 
 import api from '../../services/api';
 
-export default function Home() {
+export default function Home({navigation}) {
   const [plants, setPlants] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('All')
 
+  const plantsRef = useRef();
+
   useEffect(() => {
-    // console.log('cavalo')
     api.get('/plants')
     .then(response => {
-      // console.log(response.data)
       setPlants(response.data)    
     })
     .catch(error => {
-      // console.log(error)
+      console.log(error)
     })
   }, [])
   const categories = [
@@ -26,12 +26,15 @@ export default function Home() {
     {value: 'Seeds', viewValue: 'Sementes'},
   ]
 
-  const changeCategory = category => setSelectedCategory(category)
+  const changeCategory = category => {
+    plantsRef.current.scrollToOffset({x: 0, y: 0})
+    setSelectedCategory(category)
+  }
 
   const ProductItem = product => {
     return (
-      <Product>
-        <ProductImage source = {{uri:product.path}} />
+      <Product onPress = {() => navigation.navigate('Plant', {id: product.id})}>
+        <ProductImage source = {{uri:product.coverImage}} />
         <ProductInfo>
           <ProductTitle>
             <Text>{product.name}</Text>
@@ -53,15 +56,17 @@ export default function Home() {
                 > 
                   {item.viewValue}
                 </CategoryName> 
-                {/* {selectedCategory === category && <SelectedCategory />} */}
               </Category>
           ))}
         </Categories>
       </Header>
       <Products 
-        data = {plants} 
+        data = {plants.filter(item => {
+          return item.type.includes(selectedCategory) || selectedCategory === 'All';
+        })} 
         keyExtractor = {item => String(item.id)}
         renderItem = {({item}) => ProductItem(item)} 
+        ref = {plantsRef}
       />
     </Container>
   )
@@ -122,7 +127,6 @@ const ProductInfo = styled.View`
 
   align-items: center;
 `;
-
 
 const ProductTitle = styled.View`
 
