@@ -94,12 +94,12 @@ const Category = styled.TouchableOpacity`
   height: 32px;
 `;
 
-/* const SelectedCategory =  styled.View`
+const SelectedCategory =  styled.View`
   height: 1px;
   width: 100%;
   border-radius: 50px;
   color: #52b788;
-`; */
+`;
 
 const CategoryName = styled(Text)`
   color: ${props => props.selected ? '#6a994e' : '#000000'}; 
